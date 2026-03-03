@@ -40,7 +40,7 @@ const ExamBuilder = ({ examquestions, setExamQuestions }) => {
 
       {question.options.map((e) => (
         <div className='flex flex-row gap-3 items-center w-full' key={e.id}>
-          <div className='flex-1 h-12 border-2 bg-white rounded-xl relative overflow-visible'>
+          <div className='flex-1 h-14 border-2 bg-white rounded-xl relative overflow-visible'>
             <input 
               /* Consistent change for options as well */
               className="w-full h-full px-4 bg-transparent outline-none text-lg z-20 relative rounded-xl" 
