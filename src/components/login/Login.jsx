@@ -15,31 +15,52 @@ const Login = () => {
   const navigate=useNavigate()
 
   const handleClick=(e)=>{
-      // e.preventDefault()
-      addval(prev=>({...prev,[e.target.name]:e.target.value}))
-  }
+          // e.preventDefault()
+          addval(prev=>({...prev,[e.target.name]:e.target.value}))
+      }
 
-  const handleSubmit= async(e)=>{
-    e.preventDefault()
-    setGlobalState(prev=>({...prev,isLoading:true}))
-    try{
-        let data=await AdminServices.loginAdmin(val)
-        // console.log(formData);
-        console.log("login success");
-        setGlobalState(preval=>({...preval,name:data.name,role:data.role,token:data.token}))
-        toast.success("login success");
-        navigate("/home")
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // 1. Basic Validation
+        if (!val.email || !val.password) {
+            return toast.error("Please fill in all fields");
+        }
+
+        setGlobalState(prev => ({ ...prev, isLoading: true }));
+
+        try {
+            // 2. Authentication call
+            const data = await StudentService.loginStudent(val);
+            
+            // 3. Clear local input state
+            setVal({ email: "", password: "" });
+
+            // 4. Update Global State (This triggers the localStorage save in your Context)
+            setGlobalState(prev => ({
+                ...prev,
+                user: data,
+                isAuth: true
+            }));
+
+            toast.success("Login Successful!");
+            navigate("/studenthome", { replace: true });
+        }
+        catch (err) {
+            // 5. Enhanced Error Handling
+            const statusCode = err.response?.status;
+            let msg = "Server error, try again later";
+
+            if (statusCode === 401) msg = "Invalid password";
+            else if (statusCode === 404) msg = "User not found";
+            else if (err.response?.data) msg = err.response.data;
+
+            toast.error(msg);
+        }
+        finally {
+            setGlobalState(prev => ({ ...prev, isLoading: false }));
+        }
     }
-    catch(err){
-      toast.error("something went wrong");
-      console.log(err);
-      
-    }
-    finally{
-      setGlobalState(prev=>({...prev,isLoading:false}))
-    }
-    // addval(prev=>({...prev,[e.target.name]:e.target.value}))
-  }
   console.log(val);
   
   return (
@@ -50,7 +71,7 @@ const Login = () => {
               </div>
               <TextComp type="email" handleClick={handleClick} val={val} name="email" unit={<MdOutlineMail className="text-2xl  right-0"></MdOutlineMail>}></TextComp>
               <TextComp type="password" handleClick={handleClick} val={val} name="password" unit={[<FaEye className="text-2xl  right-0"></FaEye>,<FaEyeSlash className="text-2xl  right-0"></FaEyeSlash>]}></TextComp>
-              <button className='w-full flex items-center justify-center h-10 bg-black text-white text-2xl rounded-xl hover:scale-105 active:bg-gray-950' type='submit'>{globalstate.isLoading?<><h1>Login...</h1><Loader></Loader></>:<h1>Login</h1>}</button>
+              <button className='w-full flex gap-5 items-center justify-center h-10 bg-black text-white text-2xl rounded-xl hover:scale-105 active:bg-gray-950' type='submit'>{globalstate.isLoading?<><h1>Login...</h1><Loader></Loader></>:<h1>Login</h1>}</button>
               <div className='flex justify-center items-center gap-2' >No account? <Link to='/register' className='hover:underline hover:text-blue-500 '> Register</Link></div>
           </form>
       </div>
