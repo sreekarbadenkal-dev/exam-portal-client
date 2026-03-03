@@ -1,0 +1,44 @@
+import { createBrowserRouter } from "react-router-dom";
+import Login from "../components/login/Login.jsx";
+import Register from "../components/register/Register.jsx"
+import Home from "../home/Home.jsx";
+import StudentLogin from "../components/login/StudentLogin.jsx";
+import StudentRegister from "../components/register/StudentRegister.jsx";
+import StudentHome from "../home/StudentHome.jsx";
+
+const routes=createBrowserRouter(
+    [
+        
+        {
+            path:"/",
+            element:<Login></Login>
+        },
+        {
+            path:"/login",
+            element:<Login></Login>
+        },
+        {
+            path:"/register",
+            element:<Register></Register>
+        },
+        {
+            path:"/home",
+            element:<Home></Home>
+        },
+        {
+            path:"/studentlogin",
+            element:<StudentLogin/>
+        },
+        {
+            path:"/studentregister",
+            element:<StudentRegister></StudentRegister>
+        },
+        {
+            path:"/studenthome",
+            element:<StudentHome></StudentHome>
+        }
+
+    ]
+)
+
+export default routes;
