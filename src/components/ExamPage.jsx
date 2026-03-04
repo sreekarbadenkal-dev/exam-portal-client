@@ -78,7 +78,7 @@ const ExamPage = () => {
             console.log("Result Saved Successfully:", response.data);
 
             // Redirect to a summary page and pass the result object
-            navigate('/resultsummary', { state: { result: response.data } });
+            navigate('/resultsummary', { state: { result: response } });
             
         } catch (error) {
             console.error("Submission failed:", error);
