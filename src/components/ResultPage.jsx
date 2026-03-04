@@ -14,7 +14,7 @@ const ResultPage = () => {
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-slate-800">No Result Data Found</h2>
                     <button 
-                        onClick={() => navigate('/studentdashboard')}
+                        onClick={() => navigate('/studenthome')}
                         className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-xl"
                     >
                         Go Back
