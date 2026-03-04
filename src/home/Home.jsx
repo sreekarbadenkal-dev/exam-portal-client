@@ -38,19 +38,22 @@ const Home = () => {
 
       try {
           const cleanPayload = {
-              ...examData,
-              id: null,
-              questions: examquestions.map((q) => {
-                  // Find index for correct option mapping
-                  const correctIdx = q.options.findIndex(opt => opt.id === q.correctoption);
-                  return {
-                      ...q,
-                      correctoption: correctIdx.toString(),
-                      id: null,
-                      options: q.options.map(({ id, ...optRest }) => ({ ...optRest, id: null }))
-                  };
-              })
-          };
+            ...examData,
+            id: null,
+            questions: examquestions.map((q) => {
+                // 1. Find the index while the IDs still exist
+                const correctIdx = q.options.findIndex(opt => opt.id === q.correctoption);
+                
+                return {
+                    questiontext: q.questiontext,
+                    // 2. Use the index as a string
+                    correctoption: correctIdx !== -1 ? correctIdx.toString() : "0", 
+                    options: q.options.map((opt) => ({
+                        text: opt.text // 3. Just send the text
+                    }))
+                };
+            })
+        };
 
           const response = await ExamService.createExam(cleanPayload);
           console.log("Success:", response);
