@@ -5,6 +5,8 @@ import Home from "../home/Home.jsx";
 import StudentLogin from "../components/login/StudentLogin.jsx";
 import StudentRegister from "../components/register/StudentRegister.jsx";
 import StudentHome from "../home/StudentHome.jsx";
+import ExamPage from "../components/ExamPage.jsx";
+import ResultPage from "../components/ResultPage.jsx";
 
 const routes=createBrowserRouter(
     [
@@ -36,6 +38,14 @@ const routes=createBrowserRouter(
         {
             path:"/studenthome",
             element:<StudentHome></StudentHome>
+        },
+        {
+            path:"/exampage/:examid",
+            element:<ExamPage></ExamPage>
+        },
+        {
+            path:"/resultsummary",
+            element:<ResultPage></ResultPage>
         }
 
     ]

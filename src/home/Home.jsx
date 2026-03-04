@@ -23,54 +23,82 @@ const Home = () => {
   const handleShow = () => setShow(!show);
 
   const handleSubmit = async (e) => {
-      e.preventDefault();
+    e.preventDefault();
 
-      // 1. Guard Clause: Prevent double submission
-      if (isLoading) return;
+    // 1. Guard Clause
+    if (isLoading) return;
 
-      if (!examData.title || examquestions.length === 0) {
-          toast.error("Please provide a title and questions.");
-          return;
-      }
+    if (!examData.title || examquestions.length === 0) {
+      toast.error("Please provide a title and questions.");
+      return;
+    }
 
-      // 2. Start Loader
-      setIsLoading(true);
+    setIsLoading(true);
 
-      try {
-          const cleanPayload = {
-            ...examData,
-            id: null,
-            questions: examquestions.map((q) => {
-                // 1. Find the index while the IDs still exist
-                const correctIdx = q.options.findIndex(opt => opt.id === q.correctoption);
-                
-                return {
-                    questiontext: q.questiontext,
-                    // 2. Use the index as a string
-                    correctoption: correctIdx !== -1 ? correctIdx.toString() : "0", 
-                    options: q.options.map((opt) => ({
-                        text: opt.text // 3. Just send the text
-                    }))
-                };
-            })
-        };
+    try {
+      const cleanPayload = {
+        ...examData,
+        id: null,
+        questions: examquestions.map((q, qIdx) => {
+          
+          // A. Generate Bridge IDs (tempId) for every option in this question
+          const optionsWithBridge = q.options.map((opt) => ({
+            ...opt,
+            bridgeId: crypto.randomUUID(), 
+          }));
 
-          const response = await ExamService.createExam(cleanPayload);
-          console.log("Success:", response);
-          toast.success("Exam Created Successfully!");
+          // B. Match the local 'correctoption' pointer to the new Bridge ID
+          // We check both index-based and ID-based matching for safety
+          const correctOptionObj = 
+            optionsWithBridge[q.correctoption] || 
+            optionsWithBridge.find(opt => opt.id === q.correctoption);
+          
+          const bridgeIdForCorrect = correctOptionObj ? correctOptionObj.bridgeId : null;
 
-          // 3. Reset State on Success
-          setExamData({ title: '', examtime: '', department: [], semester: '', passpercentage: '' });
-          setExamQuestions([]);
+          // DEBUG CONSOLE: Cross-check your IDs here
+          console.log(`Question ${qIdx + 1} Mapping:`, {
+            text: q.questiontext,
+            bridgeIdSentAsCorrect: bridgeIdForCorrect,
+            allOptionsWithTempIds: optionsWithBridge.map(o => ({ 
+                text: o.text, 
+                tempId: o.bridgeId 
+            }))
+          });
 
-      } catch (error) {
-          console.error("Save failed:", error);
-          toast.error(error.response?.data?.message || "Internal Server Error");
-      } finally {
-          // 4. Stop Loader regardless of success or failure
-          setIsLoading(false);
-      }
-    };
+          return {
+            questiontext: q.questiontext,
+            // We send the UUID string to the backend
+            correctoption: bridgeIdForCorrect, 
+            options: optionsWithBridge.map((opt) => ({
+              text: opt.text,
+              tempId: opt.bridgeId // Matches @Transient field in Java
+            }))
+          };
+        })
+      };
+
+      // Final Payload Check
+      // Change this line in your handleSubmit:
+      console.log("🚀 FINAL PAYLOAD:", JSON.parse(JSON.stringify(cleanPayload)));
+
+      const response = await ExamService.createExam(cleanPayload);
+      console.log("✅ Server Response:", response);
+      toast.success("Exam Created Successfully!");
+
+      // Reset State
+      setExamData({ title: '', examtime: '', department: [], semester: '', passpercentage: '' });
+      setExamQuestions([]);
+
+    } catch (error) {
+      console.error("❌ Save failed:", error);
+      toast.error(error.response?.data?.message || "Internal Server Error");
+    } finally {
+      setIsLoading(true); // Assuming you want to stop loading
+      setIsLoading(false);
+    }
+  };
+
+    
   console.log(examData,examquestions);
   
   return (

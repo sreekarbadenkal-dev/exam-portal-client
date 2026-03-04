@@ -2,11 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { studentuser } from '../contexts/StudentContext'; // Ensure this path is correct
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { Link,useNavigate } from 'react-router-dom';
+import { ExamService } from '../services/ExamService';
 
 const StudentHome = () => {
-    const { globalstate } = useContext(studentuser);
+    const { globalstate,logout } = useContext(studentuser);
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate=useNavigate()
 
     useEffect(() => {
         const fetchMyExams = async () => {
@@ -15,11 +18,13 @@ const StudentHome = () => {
             try {
                 setLoading(true);
                 // We send the whole user object as the RequestBody
-                const response = await axios.post(
-                    "http://localhost:8080/api/exams/studentexampage", 
-                    globalstate.user
-                );
-                setExams(response.data);
+                // const response = await axios.post(
+                //     "http://localhost:8080/api/exams/studentexampage", 
+                //     globalstate.user
+                // );
+                // setExams(response.data);
+                const response=await ExamService.findExamsforStudnet(globalstate.user);
+                setExams(response);
             } catch (err) {
                 // If the backend returns 404 "No Exams for Now", we catch it here
                 if (err.response?.status === 404) {
@@ -34,6 +39,14 @@ const StudentHome = () => {
 
         fetchMyExams();
     }, [globalstate.user]);
+
+
+    console.log(globalstate);
+    
+    const handleSelectedExam=(examId)=>{
+        console.log(examId);
+        navigate(`/exampage/${examId}`);
+    }
 
     if (loading) return <div className="p-10 text-center">Loading Exams...</div>;
 
@@ -58,7 +71,7 @@ const StudentHome = () => {
                                     <span>⏱ {exam.examtime} Mins</span>
                                     <span>📚 {exam.questions?.length || 0} Questions</span>
                                 </div>
-                                <button className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
+                                <button className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition" onClick={() => handleSelectedExam(exam.id)}>
                                     Start Exam
                                 </button>
                             </div>
@@ -69,7 +82,23 @@ const StudentHome = () => {
                         </div>
                     )}
                 </div>
+                <div className='mt-8 text-center'>
+                    <Link className="text-blue-600 hover:underline" to="/studentlogin" onClick={logout}>
+                        
+                        Do you want to login with another account?
+                    </Link>
+                    <p className="text-gray-500 mt-2">
+                        This will clear your current session. If you want to login with another account, please click the link above.
+                    </p>
+                    <p className="text-gray-500 mt-2">
+                        Don't have an account?{' '}
+                        <Link className="text-blue-600 hover:underline" to="/studentregister" onClick={logout}>
+                            Register here
+                        </Link>
+                    </p>
+                </div>
             </div>
+            
         </div>
     );
 };

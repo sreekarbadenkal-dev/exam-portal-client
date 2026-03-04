@@ -15,11 +15,11 @@ const StudentLogin = () => {
     const {globalstate,setGlobalState}=useContext(studentuser)
     const navigate=useNavigate()
 
-     useEffect(()=>{
-            if(globalstate.isAuth){
-                navigate("/studenthome",{replace:true})
-            }
-        },[globalstate.isAuth,navigate])
+    //  useEffect(()=>{
+    //         if(globalstate.isAuth){
+    //             navigate("/studenthome",{replace:true})
+    //         }
+    //     },[globalstate.isAuth,navigate])
 
     const [val,setVal]=useState({
         email:"",

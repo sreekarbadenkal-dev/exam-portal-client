@@ -17,5 +17,26 @@ export const ExamService = {
     getAllExams: async () => {
         const { data } = await springExamAxios.get("api/exams/all");
         return data;
+    },
+
+    findExamsforStudnet: async (payload) => {
+        try{
+            const { data } = await springExamAxios.post("api/exams/studentexampage", payload);
+            return data;
+        }
+        catch (error) {
+            console.error("Error in findExamsforStudnet Service:", error);
+            throw error;
+        }
+    },
+
+    getExamById: async (id) => {
+        try {
+            const { data } = await springExamAxios.get(`api/exams/${id}`);          
+            return data;
+        } catch (error) {
+            console.error("Error in getExamById Service:", error);  
+            throw error;
+        }
     }
-};
+}

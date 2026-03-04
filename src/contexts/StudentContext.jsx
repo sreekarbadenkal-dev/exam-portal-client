@@ -1,9 +1,9 @@
-import React, { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState, useEffect } from 'react';
 
 export const studentuser = createContext();
 
 const StudentContext = ({ children }) => {
-    // Initialize state from localStorage if it exists
+    // 1. Initialize state from localStorage (Using "student_user" consistently)
     const [globalstate, setGlobalState] = useState(() => {
         const savedUser = localStorage.getItem("student_user");
         return {
@@ -13,7 +13,23 @@ const StudentContext = ({ children }) => {
         };
     });
 
-    // Sync state to localStorage whenever the user object changes
+    // 2. The Logout Story: Clear both Disk and Memory
+    const logout = () => {
+        // Use the same key here as you do in your initialization
+        localStorage.removeItem("student_user"); 
+        
+        // Reset the React State to trigger a re-render
+        setGlobalState({ 
+            isLoading: false, 
+            user: null, 
+            isAuth: false 
+        });
+        
+        // Optional: reload is fine, but state update might be enough
+        // window.location.reload(); 
+    };
+
+    // 3. Sync state to localStorage whenever the user object changes
     useEffect(() => {
         if (globalstate.user) {
             localStorage.setItem("student_user", JSON.stringify(globalstate.user));
@@ -23,10 +39,10 @@ const StudentContext = ({ children }) => {
     }, [globalstate.user]);
 
     return (
-        <studentuser.Provider value={{ globalstate, setGlobalState }}>
+        <studentuser.Provider value={{ globalstate, setGlobalState, logout }}>
             {children}
         </studentuser.Provider>
-    )
+    );
 }
 
 export default StudentContext;

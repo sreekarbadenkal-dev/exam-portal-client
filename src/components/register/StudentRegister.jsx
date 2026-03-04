@@ -18,11 +18,11 @@ const StudentRegister = () => {
     const {globalstate,setGlobalState}=useContext(studentuser)
     const alldepts=[{value:"COMPUTER_SCIENCE",label:"Computer Science"},{value:"ARTIFICIAL_INTELLIGENCE",label:"Artificial Intelligence"},{value:"ACCOUNTING",label:"Accounting"},{value:"BOTANY", label:"Botany"},{value:"ZOOLOGY",label:"Zoology"}];
     const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    useEffect(()=>{
-        if(globalstate.isAuth){
-            navigate("/studenthome",{replace:true})
-        }
-    },[globalstate.isAuth,navigate])
+    // useEffect(()=>{
+    //     if(globalstate.isAuth){
+    //         navigate("/studenthome",{replace:true})
+    //     }
+    // },[globalstate.isAuth,navigate])
 
     
     
