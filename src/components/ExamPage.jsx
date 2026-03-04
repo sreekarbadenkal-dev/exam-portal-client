@@ -73,7 +73,7 @@ const ExamPage = () => {
             console.log("Submitting to Backend:", submissionData);
             
             // Sending to your new ResultController
-            const response = await axios.post("http://localhost:8080/api/results/submit", submissionData);
+            const response = await ExamService.submitExamResult(submissionData);
             
             console.log("Result Saved Successfully:", response.data);
 

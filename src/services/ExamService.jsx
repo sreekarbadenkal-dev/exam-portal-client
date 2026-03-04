@@ -38,5 +38,17 @@ export const ExamService = {
             console.error("Error in getExamById Service:", error);  
             throw error;
         }
+    },
+
+    // Add this inside your ExamService object
+    submitExamResult: async (submissionData) => {
+        try {
+            // This uses your instance to hit: https://your-render-url.com/api/results/submit
+            const { data } = await springExamAxios.post("api/results/submit", submissionData);
+            return data;
+        } catch (error) {
+            console.error("Error in submitExamResult Service:", error);
+            throw error;
+        }
     }
 }
