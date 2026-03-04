@@ -48,14 +48,12 @@ const Home = () => {
           }));
 
           // B. Match the local 'correctoption' pointer to the new Bridge ID
-          // We check both index-based and ID-based matching for safety
           const correctOptionObj = 
             optionsWithBridge[q.correctoption] || 
             optionsWithBridge.find(opt => opt.id === q.correctoption);
           
           const bridgeIdForCorrect = correctOptionObj ? correctOptionObj.bridgeId : null;
 
-          // DEBUG CONSOLE: Cross-check your IDs here
           console.log(`Question ${qIdx + 1} Mapping:`, {
             text: q.questiontext,
             bridgeIdSentAsCorrect: bridgeIdForCorrect,
@@ -67,25 +65,21 @@ const Home = () => {
 
           return {
             questiontext: q.questiontext,
-            // We send the UUID string to the backend
             correctoption: bridgeIdForCorrect, 
             options: optionsWithBridge.map((opt) => ({
               text: opt.text,
-              tempId: opt.bridgeId // Matches @Transient field in Java
+              tempId: opt.bridgeId 
             }))
           };
         })
       };
 
-      // Final Payload Check
-      // Change this line in your handleSubmit:
       console.log("🚀 FINAL PAYLOAD:", JSON.parse(JSON.stringify(cleanPayload)));
 
       const response = await ExamService.createExam(cleanPayload);
       console.log("✅ Server Response:", response);
       toast.success("Exam Created Successfully!");
 
-      // Reset State
       setExamData({ title: '', examtime: '', department: [], semester: '', passpercentage: '' });
       setExamQuestions([]);
 
@@ -93,14 +87,10 @@ const Home = () => {
       console.error("❌ Save failed:", error);
       toast.error(error.response?.data?.message || "Internal Server Error");
     } finally {
-      setIsLoading(true); // Assuming you want to stop loading
       setIsLoading(false);
     }
   };
 
-    
-  console.log(examData,examquestions);
-  
   return (
     <div className='h-screen w-full flex flex-col md:flex-row overflow-hidden bg-white'>
       
@@ -122,10 +112,13 @@ const Home = () => {
                 autoComplete="off"
                 inputMode={field.mode}
                 name={field.name} 
+                id={field.name} // Added for Playwright
                 value={examData[field.name]} 
                 onChange={handleChange} 
               />
-              <label className={`absolute left-5 transition-all pointer-events-none z-10  bg-white
+              <label 
+                htmlFor={field.name} // Added for Playwright
+                className={`absolute left-5 transition-all pointer-events-none z-10  bg-white
                 ${examData[field.name] 
                   ? "top-0 -translate-y-1/2 text-[15px] text-blue-600 font-black px-1" 
                   : "top-1/2 -translate-y-1/2 text-xl text-gray-400"}`}>
@@ -142,6 +135,8 @@ const Home = () => {
                 return (
                   <button
                     key={dept.value}
+                    name={dept.label} // Added for Playwright
+                    type="button"
                     onClick={() => {
                       const newDepts = isSelected 
                         ? examData.department.filter(d => d !== dept.value)
@@ -161,7 +156,11 @@ const Home = () => {
             </div>
           </div>
 
-          <button className='h-14 w-full rounded-xl bg-amber-300 text-xl font-bold shadow-lg hover:bg-amber-400 cursor-pointer active:scale-95 transition-all' onClick={handleShow}>
+          <button 
+            name="toggle-builder" // Added for Playwright
+            className='h-14 w-full rounded-xl bg-amber-300 text-xl font-bold shadow-lg hover:bg-amber-400 cursor-pointer active:scale-95 transition-all' 
+            onClick={handleShow}
+          >
             {show ? "Close Question Builder" : "Add New Question"}
           </button>
           
@@ -177,7 +176,7 @@ const Home = () => {
             handleSubmit={handleSubmit} 
             examtitle={examData.title} 
             onDelete={deleteQuestion}
-            isLoading={isLoading} // <-- Pass this down!
+            isLoading={isLoading} 
           />
         ) : (
           <div className='m-auto text-white/50 text-2xl italic font-light'>
