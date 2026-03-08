@@ -7,6 +7,7 @@ import StudentRegister from "../components/register/StudentRegister.jsx";
 import StudentHome from "../home/StudentHome.jsx";
 import ExamPage from "../components/ExamPage.jsx";
 import ResultPage from "../components/ResultPage.jsx";
+import ViewResult from "../components/ViewResult.jsx";
 
 const routes=createBrowserRouter(
     [
@@ -46,6 +47,10 @@ const routes=createBrowserRouter(
         {
             path:"/resultsummary",
             element:<ResultPage></ResultPage>
+        },
+        {
+            path:"/viewresult/:id",
+            element:<ViewResult></ViewResult>
         }
 
     ]

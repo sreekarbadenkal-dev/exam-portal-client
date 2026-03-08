@@ -17,7 +17,7 @@ const StudentRegister = () => {
     const navigate=useNavigate()
     const {globalstate,setGlobalState}=useContext(studentuser)
     const alldepts=[{value:"COMPUTER_SCIENCE",label:"Computer Science"},{value:"ARTIFICIAL_INTELLIGENCE",label:"Artificial Intelligence"},{value:"ACCOUNTING",label:"Accounting"},{value:"BOTANY", label:"Botany"},{value:"ZOOLOGY",label:"Zoology"}];
-    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const strongPasswordRegex = /^(?:(?=.*[a-z])(?:(?=.*[A-Z])(?=.*[\d\W])|(?=.*\d)(?=.*\W))|(?=.*[A-Z])(?=.*\d)(?=.*\W)).{8,}$/;
     // useEffect(()=>{
     //     if(globalstate.isAuth){
     //         navigate("/studenthome",{replace:true})
@@ -65,6 +65,7 @@ const StudentRegister = () => {
             const data=await StudentService.createStudent(correctedstudentdata);
             setGlobalState(prev=>({...prev,user:data,isAuth:true}));
             toast.success("Registration Successfull");
+            navigate("/studenthome", { replace: true });
         }
         catch(err){
             const msg=err.response.data;

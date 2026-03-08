@@ -50,5 +50,17 @@ export const ExamService = {
             console.error("Error in submitExamResult Service:", error);
             throw error;
         }
+    },
+
+    // Add this inside your ExamService object
+    getResultById: async (resultId) => {
+        try {
+            // This hits your new GETMapping: /api/results/{id}
+            const { data } = await springExamAxios.get(`api/results/${resultId}`);
+            return data;
+        } catch (error) {
+            console.error("Error in getResultById Service:", error);
+            throw error;
+        }
     }
 }
