@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ExamService } from '../services/ExamService';
 import { studentuser } from '../contexts/StudentContext';
 import QuestionComp from './QuestionComp';
-import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const ExamPage = () => {
     // --- 1. State Management ---
@@ -17,7 +17,7 @@ const ExamPage = () => {
 
     const [currentQuestion, setCurrentQuestion] = useState({});
     
-    // This state tracks: { questionId: "selectedOptionText" }
+    // Tracks: { questionId: "selectedOptionId" }
     const [selectedAnswers, setSelectedAnswers] = useState({}); 
 
     // --- 2. Data Loading Logic ---
@@ -26,11 +26,12 @@ const ExamPage = () => {
             try {
                 const data = await ExamService.getExamById(examid);
                 setExam(data);
+                // Initialize first question with number 1
                 setCurrentQuestion({ ...data.questions[0], qno: 1 });
                 setCurrentTime(data.examtime * 60);
-                console.log("Exam Loaded:", data);
             } catch (err) {
                 console.error("Error fetching exam:", err);
+                toast.error("Failed to load exam details.");
             }
         };
 
@@ -40,19 +41,20 @@ const ExamPage = () => {
 
     // --- 3. Timer & Auto-Submit Logic ---
     useEffect(() => {
-        if (currenttime <= 0) {
-            if (currenttime === 0) handleSubmit(); // Trigger auto-submit at 0
+        if (currenttime === 0) {
+            handleSubmit(); 
             return;
         }
+        if (currenttime < 0) return;
 
         const timerId = setInterval(() => setCurrentTime(prev => prev - 1), 1000);
         return () => clearInterval(timerId);
     }, [currenttime]);
 
 
-    // --- 4. Result Handling Logic (The "Java Way") ---
+    // --- 4. Result Handling Logic ---
     
-    // Function to handle answer selection from QuestionComp
+    // Capture answer selection and store as String to match Java Map<Long, String>
     const handleAnswerSelect = (questionId, optionId) => {
         setSelectedAnswers(prev => ({
             ...prev,
@@ -60,29 +62,29 @@ const ExamPage = () => {
         }));
     };
 
-    // The Main Submission Function
+    // The Main Submission Function updated for the new ResultController
     const handleSubmit = async () => {
-        // Construct the DTO to match your Java AnswerSubmissionDTO
+        // Construct DTO: keys must match your AnswerSubmissionDTO.java exactly
         const submissionData = {
-            examid: exam.id,
+            examid: parseInt(examid),
             studentid: student.id,
-            selectedOptions: selectedAnswers 
+            selectedOptions: selectedAnswers // Your controller uses 'getSelectedOptions()'
         };
 
         try {
-            console.log("Submitting to Backend:", submissionData);
+            toast.loading("Grading your exam...", { id: "submit-toast" });
             
-            // Sending to your new ResultController
+            // Sending to ResultController @PostMapping("/submit")
             const response = await ExamService.submitExamResult(submissionData);
             
-            console.log("Result Saved Successfully:", response.data);
+            toast.success("Exam submitted successfully!", { id: "submit-toast" });
 
-            // Redirect to a summary page and pass the result object
-            navigate('/resultsummary', { state: { result: response } });
+            // Navigate to view the scorecard using the newly created Result ID
+            navigate(`/viewresult/${response.id}`);
             
         } catch (error) {
             console.error("Submission failed:", error);
-            alert("Error submitting exam. Please check your connection.");
+            toast.error("Submission failed. Please try again.", { id: "submit-toast" });
         }
     };
 
@@ -105,7 +107,7 @@ const ExamPage = () => {
 
             {/* Global Navigation Bar */}
             <div className='w-full h-16 flex items-center justify-between px-6 bg-white shadow-sm border-b border-slate-200 z-10'>
-                <h1 className='text-xl font-black text-blue-600 tracking-tighter'>MY EXAM APP</h1>
+                <h1 className='text-xl font-black text-blue-600 tracking-tighter'>EXAM PORTAL</h1>
                 <div className='flex items-center gap-4'>
                     <button 
                         onClick={handleSubmit}
@@ -118,7 +120,7 @@ const ExamPage = () => {
 
             <div className='flex-1 w-full flex flex-col md:flex-row p-4 md:p-6 gap-6 overflow-hidden'>
 
-                {/* Left Side: Question Area (75%) */}
+                {/* Left Side: Question Area */}
                 <div className='w-full md:w-3/4 flex flex-col gap-4 p-6 md:p-8 rounded-3xl bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] border border-slate-200 overflow-y-auto'>
                     
                     {/* Header */}
@@ -127,7 +129,7 @@ const ExamPage = () => {
                             <h1 className='text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight'>
                                 {exam?.title} <span className='text-blue-600 font-medium'>Exam</span>
                             </h1>
-                            <p className='text-slate-500 font-medium mt-1'>Student: {student["username"]}</p>
+                            <p className='text-slate-500 font-medium mt-1 uppercase text-xs tracking-widest'>Candidate: {student?.username}</p>
                         </div>
 
                         <div className={`flex items-center gap-3 px-5 py-2.5 rounded-2xl font-mono text-xl font-bold transition-all duration-300 ${
@@ -141,7 +143,6 @@ const ExamPage = () => {
                     <div className='w-full mt-2'>
                         {currentQuestion.id ? (
                             <div className="w-full">
-                                {/* Added onSelect prop to capture answer in the parent state */}
                                 <QuestionComp 
                                     question={currentQuestion} 
                                     selectedAnswer={selectedAnswers[currentQuestion.id]}
@@ -151,32 +152,46 @@ const ExamPage = () => {
                         ) : (
                             <div className="w-full h-64 flex flex-col items-center justify-center gap-3 text-slate-400">
                                 <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin"></div>
-                                <p>Initializing Exam Content...</p>
+                                <p>Loading Exam Questions...</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Right Side: Sidebar Palette (25%) */}
+                {/* Right Side: Sidebar Palette */}
                 <div className='w-full md:w-1/4 flex flex-col bg-white shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] rounded-3xl border border-slate-200 p-6 gap-6 h-fit md:sticky md:top-6'>
-                    <h2 className='text-xl font-bold text-slate-900 border-b pb-4'>Questions</h2>
+                    <div className='flex justify-between items-center border-b pb-4'>
+                        <h2 className='text-xl font-bold text-slate-900'>Progress</h2>
+                        <span className='text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md'>
+                            {Object.keys(selectedAnswers).length} / {exam?.questions?.length} Solved
+                        </span>
+                    </div>
                     
                     <div className='grid grid-cols-5 gap-3'>
                         {exam?.questions?.map((question, index) => (
                             <button 
                                 key={index} 
                                 onClick={() => handleCurrentQuestion(question, index + 1)} 
-                                className={`h-12 w-12 text-sm font-bold rounded-xl border-2 transition-all ${
+                                className={`h-11 w-11 text-sm font-bold rounded-xl border-2 transition-all ${
                                     currentQuestion?.qno === index + 1
                                         ? 'bg-blue-600 text-white border-blue-600 scale-110 shadow-md'
-                                        : selectedAnswers[question.id] // Highlight answered questions
-                                            ? 'bg-green-50 text-green-600 border-green-200'
-                                            : 'bg-gray-50 text-slate-500 border-gray-50 hover:border-blue-200'
+                                        : selectedAnswers[question.id] 
+                                            ? 'bg-green-50 text-green-600 border-green-200 shadow-sm'
+                                            : 'bg-gray-50 text-slate-400 border-transparent hover:border-slate-200'
                                 }`}
                             >
                                 {index + 1}
                             </button>
                         ))}
+                    </div>
+
+                    <div className='mt-4 pt-4 border-t border-slate-100'>
+                         <div className='flex items-center gap-2 text-xs font-bold text-slate-400 uppercase'>
+                            <span className='w-2 h-2 bg-green-400 rounded-full'></span> Answered
+                         </div>
+                         <div className='flex items-center gap-2 text-xs font-bold text-slate-400 uppercase mt-2'>
+                            <span className='w-2 h-2 bg-blue-600 rounded-full'></span> Current
+                         </div>
                     </div>
                 </div>
 

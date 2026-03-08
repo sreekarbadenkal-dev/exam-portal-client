@@ -116,9 +116,20 @@ const ViewResult = () => {
 
                         {/* Call to Action */}
                         <div className="mt-12 text-center">
-                            <p className="text-gray-400 text-sm mb-6">
-                                * Detailed analysis and question-wise corrections are available upon request from the department.
-                            </p>
+                            {/* NEW: Button to navigate to Detailed Review */}
+                            <div className="mb-6">
+                                <button 
+                                    onClick={() => navigate(`/viewdetailedresult/${id}`, { state: { resultData } })}
+                                    className="px-8 py-2 bg-blue-50 text-blue-600 font-bold rounded-full border-2 border-blue-100 hover:bg-blue-600 hover:text-white transition-all active:scale-95 shadow-sm"
+                                >
+                                    Review Detailed Analysis
+                                </button>
+                                <p className="text-gray-400 text-xs mt-3">
+                                    Click above to view question-wise corrections and explanations.
+                                </p>
+                            </div>
+
+                            {/* Existing Print Button */}
                             <button 
                                 onClick={() => window.print()}
                                 className="px-10 py-3 bg-gray-800 text-white font-bold rounded-xl hover:bg-black transition-all shadow-lg active:scale-95"
