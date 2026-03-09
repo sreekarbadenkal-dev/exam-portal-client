@@ -1,16 +1,33 @@
-# React + Vite
+# 🎓 Online Examination System - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive user interface for managing and taking online examinations. Built with **React** and styled with **Tailwind CSS**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Live Demo
+**Frontend URL:** [https://exam-portal-client.onrender.com](https://exam-portal-client.onrender.com)  
+**Backend API:** Linked via Render (Spring Boot)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tech Stack
+- **Library:** React.js (Vite)
+- **Styling:** Tailwind CSS
+- **State Management:** React Context API
+- **Routing:** React Router DOM
+- **API Calls:** Axios
 
-## Expanding the ESLint configuration
+## ✨ Key Features
+- **Student Dashboard:** View available exams and track performance.
+- **Responsive Design:** Optimized for mobile, tablet, and desktop views.
+- **Dynamic Forms:** Robust validation for student registration and login.
+- **Role-Based UI:** Specific components and routes for Students and Admins.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🔗 Project Architecture
+This is a **Full Stack** application. The backend code for this project is hosted in a separate repository:
+👉 **[View Backend Repository](https://github.com/sreekarbadenkal-dev/your-backend-repo-name)**
+
+## 💻 How to Run Locally
+1. Clone the repo: `git clone https://github.com/sreekarbadenkal-dev/exam-portal-client.git`
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
